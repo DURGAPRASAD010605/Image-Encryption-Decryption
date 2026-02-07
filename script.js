@@ -1,7 +1,7 @@
 const KEY = 123;
-const BLOCK = 32;
+const BLOCK = 16; // Best block size (secure + stable)
 
-// ---------- Simple XORShift PRNG (seeded) ----------
+// ---------- Simple XORShift PRNG ----------
 function XORShift(seed) {
     return function () {
         seed ^= seed << 13;
@@ -12,19 +12,18 @@ function XORShift(seed) {
 }
 
 // ---------- Generate deterministic permutation ----------
-function generatePermutation(totalBlocks, seed) {
+function generatePermutation(total, seed) {
     const rand = XORShift(seed);
-    const arr = Array.from({ length: totalBlocks }, (_, i) => i);
+    const arr = Array.from({ length: total }, (_, i) => i);
 
-    // Fisher-Yates Shuffle
-    for (let i = totalBlocks - 1; i > 0; i--) {
+    for (let i = total - 1; i > 0; i--) {
         const j = Math.floor(rand() * (i + 1));
         [arr[i], arr[j]] = [arr[j], arr[i]];
     }
     return arr;
 }
 
-// ---------- Image Loader ----------
+// ---------- Load image ----------
 function loadImage(fileInput, canvasId, callback) {
     const file = fileInput.files[0];
     if (!file) return alert("Upload an image!");
@@ -36,8 +35,8 @@ function loadImage(fileInput, canvasId, callback) {
 
         canvas.width = img.width;
         canvas.height = img.height;
-        ctx.drawImage(img, 0, 0);
 
+        ctx.drawImage(img, 0, 0);
         callback(canvas, ctx);
     };
     img.src = URL.createObjectURL(file);
@@ -47,51 +46,45 @@ function loadImage(fileInput, canvasId, callback) {
 function applyXOR(data) {
     for (let i = 0; i < data.length; i += 4) {
         data[i] ^= KEY;
-        data[i+1] ^= KEY;
-        data[i+2] ^= KEY;
+        data[i + 1] ^= KEY;
+        data[i + 2] ^= KEY;
     }
 }
 
-// ---------- TRUE reversible block shuffling ----------
+// ---------- Reversible Block Shuffle ----------
 function shuffleBlocks(data, width, height, reverse = false) {
-    const blockW = BLOCK;
-    const blockH = BLOCK;
-
-    const bxCount = Math.ceil(width / blockW);
-    const byCount = Math.ceil(height / blockH);
-    const totalBlocks = bxCount * byCount;
+    const blocksX = Math.ceil(width / BLOCK);
+    const blocksY = Math.ceil(height / BLOCK);
+    const totalBlocks = blocksX * blocksY;
 
     const perm = generatePermutation(totalBlocks, KEY);
-    const invPerm = Array(totalBlocks);
-
-    perm.forEach((p, i) => invPerm[p] = i);
+    const inverse = Array(totalBlocks);
+    perm.forEach((p, i) => (inverse[p] = i));
 
     const output = new Uint8ClampedArray(data.length);
 
-    for (let blockIndex = 0; blockIndex < totalBlocks; blockIndex++) {
-        const srcIndex = reverse ? perm[blockIndex] : blockIndex;
-        const dstIndex = reverse ? blockIndex : perm[blockIndex];
+    for (let index = 0; index < totalBlocks; index++) {
+        const srcBlock = reverse ? perm[index] : index;
+        const dstBlock = reverse ? index : perm[index];
 
-        const sx = (srcIndex % bxCount) * blockW;
-        const sy = Math.floor(srcIndex / bxCount) * blockH;
+        const sx = (srcBlock % blocksX) * BLOCK;
+        const sy = Math.floor(srcBlock / blocksX) * BLOCK;
 
-        const dx = (dstIndex % bxCount) * blockW;
-        const dy = Math.floor(dstIndex / bxCount) * blockH;
+        const dx = (dstBlock % blocksX) * BLOCK;
+        const dy = Math.floor(dstBlock / blocksX) * BLOCK;
+
+        const blockW = Math.min(BLOCK, width - sx);
+        const blockH = Math.min(BLOCK, height - sy);
 
         for (let y = 0; y < blockH; y++) {
             for (let x = 0; x < blockW; x++) {
-                const sxx = sx + x, syy = sy + y;
-                const dxx = dx + x, dyy = dy + y;
+                const sPos = ((sy + y) * width + (sx + x)) * 4;
+                const dPos = ((dy + y) * width + (dx + x)) * 4;
 
-                if (sxx < width && syy < height && dxx < width && dyy < height) {
-                    const sPos = (syy * width + sxx) * 4;
-                    const dPos = (dyy * width + dxx) * 4;
-
-                    output[dPos] = data[sPos];
-                    output[dPos+1] = data[sPos+1];
-                    output[dPos+2] = data[sPos+2];
-                    output[dPos+3] = data[sPos+3];
-                }
+                output[dPos] = data[sPos];
+                output[dPos + 1] = data[sPos + 1];
+                output[dPos + 2] = data[sPos + 2];
+                output[dPos + 3] = data[sPos + 3];
             }
         }
     }
@@ -99,12 +92,11 @@ function shuffleBlocks(data, width, height, reverse = false) {
     return output;
 }
 
-// ---------- ENCRYPT ----------
+// ---------- Encrypt ----------
 function encryptImage() {
     loadImage(document.getElementById("encryptUpload"), "encryptCanvas", (canvas, ctx) => {
         const { width, height } = canvas;
         let imgData = ctx.getImageData(0, 0, width, height);
-
         let data = imgData.data;
 
         data = shuffleBlocks(data, width, height, false);
@@ -112,16 +104,16 @@ function encryptImage() {
 
         imgData.data.set(data);
         ctx.putImageData(imgData, 0, 0);
+
         alert("Encrypted!");
     });
 }
 
-// ---------- DECRYPT ----------
+// ---------- Decrypt ----------
 function decryptImage() {
     loadImage(document.getElementById("decryptUpload"), "decryptCanvas", (canvas, ctx) => {
         const { width, height } = canvas;
         let imgData = ctx.getImageData(0, 0, width, height);
-
         let data = imgData.data;
 
         applyXOR(data);
@@ -129,6 +121,7 @@ function decryptImage() {
 
         imgData.data.set(data);
         ctx.putImageData(imgData, 0, 0);
+
         alert("Decrypted!");
     });
 }
