@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Image Encryption & Decryption</title>
+<link rel="stylesheet" href="style.css">
+
+<!-- Modern Google Font -->
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+
+</head>
+<body>
+
+<header>
+    <h1>🔐 Image Encryption & Decryption</h1>
+    <p>Encrypts and Decrypts your image for Secure transfer</p>
+</header>
+
+<div class="container">
+
+    <!-- Encrypt Box -->
+    <div class="section">
+        <h2>Encrypt Image</h2>
+
+        <label class="uploadBox">
+            <input type="file" id="encryptUpload" accept="image/*">
+            <span>📁 Click to upload or drop image here</span>
+        </label>
+
+        <button class="btn primary" onclick="encryptImage()">Encrypt</button>
+        <button class="btn" onclick="downloadEncrypted()">Download Encrypted</button>
+
+        <canvas id="encryptCanvas"></canvas>
+    </div>
+
+    <!-- Decrypt Box -->
+    <div class="section">
+        <h2>Decrypt Image</h2>
+
+        <label class="uploadBox">
+            <input type="file" id="decryptUpload" accept="image/*">
+            <span>📁 Upload previously encrypted image</span>
+        </label>
+
+        <button class="btn primary" onclick="decryptImage()">Decrypt</button>
+        <button class="btn" onclick="downloadDecrypted()">Download Decrypted</button>
+
+        <canvas id="decryptCanvas"></canvas>
+    </div>
+
+</div>
+
+
+
+<script src="script.js"></script>
+</body>
+</html>
