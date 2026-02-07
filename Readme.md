@@ -1,143 +1,114 @@
-🔐 Image Encryption & Decryption
+# 🔐 Image Encryption & Decryption (Frontend-Only)
 
-A modern, browser-based Image Encryption & Decryption Web Application
-built entirely using HTML5, CSS3, JavaScript, and Canvas API.
+A lightweight, browser-based web application that encrypts and decrypts images using **block shuffling** and **XOR-based pixel encryption**.  
+Built with **HTML5 Canvas**, **JavaScript**, and **CSS**, with **no backend** and **no external libraries**.
 
-🚀 LIVE DEMO:
-👉 https://image-encryption-decryption.netlify.app/
+🌐 Live Demo:  
+https://image-encryption-decryption.netlify.app/
 
-🌟 Overview
+---
 
-This project demonstrates a simple yet powerful method to encrypt and
-decrypt images directly in the browser.
-It uses a combination of:
+## 🚀 Features
 
--   Block Shuffling (pixel rearrangement)
--   XOR Pixel Encryption
+- Upload any image (JPG, PNG, WebP)
+- Encrypt using:
+  - Key-based block permutation
+  - XOR pixel scrambling
+- Decrypt with perfect restoration
+- Download encrypted/decrypted images
+- Works 100% client-side
+- Clean and responsive UI
 
-Together, these transform the image into a highly scrambled and
-unreadable form, and restore it perfectly during decryption.
+---
 
-This project is ideal for:
+## 🧠 How the Encryption Works
 
-✔ Academic cybersecurity assignments
-✔ Demonstrating encryption concepts
-✔ Learning Canvas pixel manipulation
-✔ Offline browser-based processing
+### **1️⃣ Block Shuffling**
+- The image is divided into blocks (default: 16×16)
+- A seeded pseudo-random permutation is generated using XORShift
+- Blocks are rearranged into a new order
+- A reverse permutation is used during decryption
 
-✨ Features
+### **2️⃣ XOR Pixel Encryption**
+Each RGB value is XORed with a symmetric key:
 
-🔐 Image Encryption
-- Deterministic key-based block shuffling
-- XOR-based pixel scrambling
-- High visual distortion
-- Fast & entirely local processing
-
-🔓 Image Decryption
-- Reverses pixel XOR
-- Reverses block permutation
-- Fully restores the original image
-
-💡 Additional Features
-- Clean and beautiful UI
-- Modern gradient background
-- Responsive and smooth layout
-- No external servers or libraries
-- Secure (image never leaves your device)
-
-🧠 How It Works
-
-1️⃣ Load Image
-The uploaded image is drawn onto an HTML5 canvas.
-
-2️⃣ Extract Pixels
-Using getImageData() we access RGBA pixel values.
-
-3️⃣ Block Shuffling (Confusion)
-- The image is divided into fixed-size blocks (e.g., 32×32 px)
-- A seeded pseudo-random permutation reorders the blocks
-- Produces a scrambled, puzzle-like encrypted output
-- Fully reversible using the same seed/key
-
-4️⃣ XOR Encryption (Diffusion)
-Each pixel's RGB values are XOR-encrypted using a fixed symmetric key:
-
-R = R XOR KEY
-G = G XOR KEY
+```
+R = R XOR KEY  
+G = G XOR KEY  
 B = B XOR KEY
+```
 
-5️⃣ Decryption
-- XOR is applied again → restores original colors
-- Reverse permutation is applied → restores original positions
-- Produces a pixel-perfect restoration of the original image
+Applying XOR a second time restores original colors.
 
-📁 Project Structure
+---
 
-📦 Image-Encryption-Decryption
+## 🔁 Decryption Process
+
+Decryption reverses the encryption steps:
+
+1. Reverse XOR  
+2. Reverse block permutation  
+3. Canvas renders the original image
+
+This produces a **pixel-perfect** restoration.
+
+---
+
+## 📁 Project Structure
+
+```
+project/
 │── index.html
 │── style.css
 │── script.js
 │── README.md
+```
 
-🖼️ Screenshots (Add your own images)
+---
 
-🔳 Original Image
-(Insert screenshot)
+## ▶️ How to Run
 
-🔮 Encrypted Image
-(Insert screenshot)
+Just open:
 
-🔓 Decrypted Image
-(Insert screenshot)
-
-▶️ Run Locally
-
-Clone the repository:
-
-git clone
-https://github.com/yourusername/image-encryption-decryption.git
-cd image-encryption-decryption
-
-Then open:
+```
 index.html
+```
 
-The project runs instantly in any modern browser.
-No installation or server required.
+Works instantly in any modern browser — no setup required.
 
-🎓 Academic Notes (Useful for Viva & Documentation)
+---
 
--   Uses symmetric encryption (same key for both encryption &
-    decryption)
--   Combines block-based permutation + pixel-level XOR scrambling
--   Entire processing happens inside browser memory
--   No backend → no image is ever uploaded or stored
--   Demonstrates essential cryptography principles:
-    -   Confusion
-    -   Diffusion
-    -   Deterministic pseudo-randomness
+## ⚙️ Customization
 
-🚀 Future Enhancements
+### **Block Size**
+```javascript
+const BLOCK = 16;
+```
 
--   Adjustable block size
--   Custom user-provided encryption key
--   Drag & drop upload
--   Dark/light theme toggle
--   Multi-layer encryption
--   Animated encryption preview
--   Mobile-optimized UI improvements
+### **XOR Key**
+```javascript
+const KEY = 123;
+```
 
-❤️ Acknowledgements
+---
 
-Built using:
-HTML5 
-Canvas
-CSS3
-JavaScript
+## 🎯 Planned Enhancements
 
-Designed for educational & academic purposes.
+- Adjustable block size from UI
+- Custom user-entered encryption key
+- Drag & drop image upload
+- Dark / light theme toggle
+- Multi-layer encryption options
+- Animated encryption/decryption preview
+- More mobile-friendly UI improvements
 
-🌍 Live Version
-https://image-encryption-decryption.netlify.app
+---
 
-⭐ If you found this useful, consider giving the project a star on
-GitHub!
+## 🛠️ Tech Stack
+
+- HTML5 Canvas  
+- JavaScript  
+- CSS3  
+
+---
+
