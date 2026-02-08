@@ -18,7 +18,7 @@ Now includes **user‑entered encryption keys**, while preserving the original b
 - Works offline — just open `index.html`
 - Download encrypted/decrypted image
 
-##🌍 Live Website
+## 🌍 Live Website
 -👉 https://image-encryption-decryption.netlify.app/
 ---
 
