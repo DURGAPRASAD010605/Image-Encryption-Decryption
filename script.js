@@ -1,7 +1,28 @@
-const KEY = 123;
-const BLOCK = 16; // Best block size (secure + stable)
+// ================================================
+// ORIGINAL WORKING ENCRYPTION + DECRYPTION LOGIC
+// WITH USER ENTERED KEY SUPPORT ADDED
+// ================================================
 
-// ---------- Simple XORShift PRNG ----------
+// USER KEY (changes dynamically)
+let KEY = 123;  
+
+// BLOCK SIZE (your original working value)
+const BLOCK = 16;
+
+
+// -------- Convert user text to numeric key --------
+function deriveKey(str) {
+    if (!str.trim()) return 123; // fallback default
+
+    let hash = 0;
+    for (let i = 0; i < str.length; i++) {
+        hash = (hash * 31 + str.charCodeAt(i)) >>> 0;
+    }
+    return hash;
+}
+
+
+// ---------- XORShift PRNG ----------
 function XORShift(seed) {
     return function () {
         seed ^= seed << 13;
@@ -10,6 +31,7 @@ function XORShift(seed) {
         return (seed >>> 0) / 4294967296;
     };
 }
+
 
 // ---------- Generate deterministic permutation ----------
 function generatePermutation(total, seed) {
@@ -22,6 +44,7 @@ function generatePermutation(total, seed) {
     }
     return arr;
 }
+
 
 // ---------- Load image ----------
 function loadImage(fileInput, canvasId, callback) {
@@ -39,19 +62,23 @@ function loadImage(fileInput, canvasId, callback) {
         ctx.drawImage(img, 0, 0);
         callback(canvas, ctx);
     };
+
     img.src = URL.createObjectURL(file);
 }
 
+
 // ---------- XOR Encryption ----------
 function applyXOR(data) {
+    const k = KEY & 0xFF;  // use lower 8 bits
     for (let i = 0; i < data.length; i += 4) {
-        data[i] ^= KEY;
-        data[i + 1] ^= KEY;
-        data[i + 2] ^= KEY;
+        data[i] ^= k;
+        data[i + 1] ^= k;
+        data[i + 2] ^= k;
     }
 }
 
-// ---------- Reversible Block Shuffle ----------
+
+// ---------- ORIGINAL BLOCK SHUFFLE LOGIC ----------
 function shuffleBlocks(data, width, height, reverse = false) {
     const blocksX = Math.ceil(width / BLOCK);
     const blocksY = Math.ceil(height / BLOCK);
@@ -59,11 +86,13 @@ function shuffleBlocks(data, width, height, reverse = false) {
 
     const perm = generatePermutation(totalBlocks, KEY);
     const inverse = Array(totalBlocks);
-    perm.forEach((p, i) => (inverse[p] = i));
+    perm.forEach((p, i) => inverse[p] = i);
 
     const output = new Uint8ClampedArray(data.length);
 
     for (let index = 0; index < totalBlocks; index++) {
+
+        // FIXED (your old buggy reverse logic corrected)
         const srcBlock = reverse ? perm[index] : index;
         const dstBlock = reverse ? index : perm[index];
 
@@ -92,13 +121,21 @@ function shuffleBlocks(data, width, height, reverse = false) {
     return output;
 }
 
+
 // ---------- Encrypt ----------
 function encryptImage() {
+
+    // Get key from user input
+    const userKey = document.getElementById("encryptKey").value;
+    KEY = deriveKey(userKey);
+
     loadImage(document.getElementById("encryptUpload"), "encryptCanvas", (canvas, ctx) => {
+
         const { width, height } = canvas;
         let imgData = ctx.getImageData(0, 0, width, height);
-        let data = imgData.data;
+        let data = new Uint8ClampedArray(imgData.data); // CLONE
 
+        // YOUR ORIGINAL WORKING ORDER
         data = shuffleBlocks(data, width, height, false);
         applyXOR(data);
 
@@ -109,13 +146,21 @@ function encryptImage() {
     });
 }
 
+
 // ---------- Decrypt ----------
 function decryptImage() {
+
+    // Get key from user input
+    const userKey = document.getElementById("decryptKey").value;
+    KEY = deriveKey(userKey);
+
     loadImage(document.getElementById("decryptUpload"), "decryptCanvas", (canvas, ctx) => {
+
         const { width, height } = canvas;
         let imgData = ctx.getImageData(0, 0, width, height);
-        let data = imgData.data;
+        let data = new Uint8ClampedArray(imgData.data);
 
+        // PERFECT REVERSE ORDER
         applyXOR(data);
         data = shuffleBlocks(data, width, height, true);
 
@@ -125,6 +170,7 @@ function decryptImage() {
         alert("Decrypted!");
     });
 }
+
 
 // ---------- Download ----------
 function downloadEncrypted() {

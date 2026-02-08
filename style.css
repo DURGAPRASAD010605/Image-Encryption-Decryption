@@ -118,3 +118,11 @@ footer {
     background: white;
     box-shadow: 0px -2px 8px rgba(0,0,0,0.1);
 }
+.keyBox {
+    width: 95%;
+    padding: 10px;
+    margin-bottom: 15px;
+    border-radius: 8px;
+    border: 1px solid #bbb;
+    font-size: 1rem;
+}

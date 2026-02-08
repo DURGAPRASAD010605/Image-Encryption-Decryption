@@ -30,6 +30,8 @@
         <button class="btn primary" onclick="encryptImage()">Encrypt</button>
         <button class="btn" onclick="downloadEncrypted()">Download Encrypted</button>
 
+	<input type="text" id="encryptKey" placeholder="Enter encryption key" class="keyBox">
+
         <canvas id="encryptCanvas"></canvas>
     </div>
 
@@ -44,6 +46,8 @@
 
         <button class="btn primary" onclick="decryptImage()">Decrypt</button>
         <button class="btn" onclick="downloadDecrypted()">Download Decrypted</button>
+	
+	<input type="text" id="decryptKey" placeholder="Enter key to decrypt" class="keyBox">
 
         <canvas id="decryptCanvas"></canvas>
     </div>
